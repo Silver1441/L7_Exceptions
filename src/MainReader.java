@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -22,6 +24,7 @@ public class MainReader {
 
     /**
      * Точка входа в программу
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -35,35 +38,43 @@ public class MainReader {
         //Открываем потоки на чтение из файла
         try {
             FileReader reader = new FileReader("file.txt");
-        } catch (FileNotFoundException ex) {
+            BufferedReader byfReader = new BufferedReader(reader);
+
+            //Читаем первую строку из файла
+            String strDate = byfReader.readLine();
+
+            while (strDate != null) {
+                //Преобразуем строку в дату
+                Date date = parseDate(strDate);
+
+                //Выводим дату в консоль в формате dd-mm-yy
+                if (date != null){
+                    System.out.printf("%1$td-%1$tm-%1$ty \n", date);
+                }
+
+                //Читаем следующую строку из файла
+                strDate = byfReader.readLine();
+
+            }
+        } catch (FileNotFoundException e) {
             System.out.println("File not found");
-        }
-
-
-        BufferedReader byfReader = new BufferedReader(reader);
-
-        //Читаем первую строку из файла
-        String strDate = byfReader.readLine();
-
-        while(strDate != null) {
-            //Преобразуем строку в дату
-            Date date = parseDate(strDate);
-
-            //Выводим дату в консоль в формате dd-mm-yy
-            System.out.printf("%1$td-%1$tm-%1$ty \n", date);
-
-            //Читаем следующую строку из файла
-            strDate = byfReader.readLine();
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     /**
      * Метод преобразует строковое представление даты в класс Date
+     *
      * @param strDate строковое представление даты
      * @return
      */
     public static Date parseDate(String strDate) {
-        return dateFormatter.parse(strDate);
+        try {
+            return dateFormatter.parse(strDate);
+        } catch (ParseException e) {
+            System.out.println("incorrect date format:  " + strDate);
+        }
+        return null;
     }
 }
