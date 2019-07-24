@@ -1,3 +1,7 @@
+package task1;
+
+import task1.exception.FileNoLongerAvailableException;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -28,17 +32,21 @@ public class MainReader {
      * @param args
      */
     public static void main(String[] args) {
-        readFile();
+        try {
+            readFile();
+        } catch (FileNoLongerAvailableException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause().getMessage());
+        }
     }
 
     /**
      * Метод для чтения дат из файла
      */
-    public static void readFile() {
+    public static void readFile() throws FileNoLongerAvailableException {
         //Открываем потоки на чтение из файла
-        try {
-            FileReader reader = new FileReader("file.txt");
-            BufferedReader byfReader = new BufferedReader(reader);
+        try(FileReader reader = new FileReader("file.txt");
+            BufferedReader byfReader = new BufferedReader(reader)) {
 
             //Читаем первую строку из файла
             String strDate = byfReader.readLine();
@@ -59,7 +67,7 @@ public class MainReader {
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FileNoLongerAvailableException("IOException occurred, file is no longer available:", e);
         }
     }
 
@@ -73,8 +81,10 @@ public class MainReader {
         try {
             return dateFormatter.parse(strDate);
         } catch (ParseException e) {
-            System.out.println("incorrect date format:  " + strDate);
+            System.out.println("incorrect date format:  " + "\"" + strDate + "\"");
         }
         return null;
     }
+
+
 }
